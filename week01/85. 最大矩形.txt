@@ -1,0 +1,64 @@
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+
+        int area = 0;
+        for(int i=0; i < matrix.length; i++){
+            //形成条形图数组
+            int[] heights = new int[matrix[i].length];
+
+            for(int j=0; j<heights.length; j++){
+                if(matrix[i][j] == '0'){
+                    heights[j] = 0;
+                }else{
+                    int jHeight = 1;
+                    for(int k=i-1; k>=0; k--){
+                        if(matrix[k][j] == '1'){jHeight++;}
+                        else{break;}
+                    }
+                    heights[j] = jHeight;
+                }
+            }
+
+            //计算一层中最大面积
+            area = Math.max(area, largestRectangleArea(heights) );
+        }
+
+        return area;
+    }
+
+    //单调栈 求解数组形成的条形图中的最大矩形
+    public int largestRectangleArea(int[] heights) {
+        Stack<Rectangle> stack = new Stack<>();
+
+        int area = 0;
+        for(int height : heights){
+            int accWidth = 0;
+            while(!stack.isEmpty() && stack.lastElement().height > height){
+                accWidth += stack.lastElement().width;
+                area = Math.max(area, accWidth * stack.lastElement().height);
+                stack.pop();
+            }
+
+            stack.push(new Rectangle(height,accWidth+1));
+        }
+
+        int accWidth = 0;
+        while(!stack.isEmpty()){
+            accWidth += stack.lastElement().width;
+            area = Math.max(area, accWidth * stack.lastElement().height);
+            stack.pop();
+        }
+
+        return area;
+    }
+
+    class Rectangle{
+        int height;
+        int width;
+        Rectangle(int height, int width){
+            this.height = height;
+            this.width = width;
+        }
+    }
+
+}
